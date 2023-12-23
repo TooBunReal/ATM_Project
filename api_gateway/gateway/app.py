@@ -1,9 +1,12 @@
 # api_gateway.py
-from flask import Flask, jsonify, request, redirect
+from flask import Flask, jsonify, request, redirect, render_template
 import jwt
 import requests
+from json import dumps, loads, dump
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+
 
 SERVICES = {
     'authentication': 'http://authentication_service:5002/login',
@@ -43,6 +46,20 @@ def gateway_register():
         # Logic đăng ký người dùng có thể được thêm vào đây
         return jsonify({'message': 'User registration endpoint'})
 
+# Route for /files/
+@app.route('/files', methods=['GET'])
+def file_page():
+    api_url = f"http://./api/allproduct"
+    req = requests.get(api_url)
+    files =  req.json()
+    for file in files:
+        print(loads(file['id']))
+        print('ok')
+        file['id'] = loads(file['id'])
+    print(files)
+    file_path = f"./static/json/files.json"
+    dump(files, open(file_path,'w'))
+    return render_template('files.html', title="Files")
 
 @app.route('/readfile', methods=['GET', 'POST'])
 def gateway_readfile():
