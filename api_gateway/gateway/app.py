@@ -2,15 +2,10 @@
 from flask import Flask, jsonify, request, redirect
 import jwt
 import requests
+from callAPI import manage_operation
+from service import SERVICES
 
 app = Flask(__name__)
-
-SERVICES = {
-    'authentication': 'http://authentication_service:5002/login',
-    'authorization': 'http://authorization_service:5005/authorize',
-    'admin_service': 'http://admin_service:5003/admin',
-    'management_service': 'http://management_service:5004/management',
-}
 
 
 @app.route('/', methods=['GET'])
@@ -41,64 +36,29 @@ def gateway_register():
         return jsonify({'message': 'User registration endpoint'})
 
 
-@app.route('/management/read', methods=['GET', 'POST'])
+@app.route('/read', methods=['GET', 'POST'])
 def gateway_management_read():
-    return manage_operation('read')
+    return manage_operation('read', 'read_file')
 
 
-@app.route('/management/update', methods=['GET', 'POST'])
+@app.route('/update', methods=['GET', 'POST'])
 def gateway_management_update():
-    return manage_operation('update')
+    return manage_operation('update', 'update_file')
 
 
-@app.route('/management/delete', methods=['GET', 'POST'])
+@app.route('/delete', methods=['GET', 'POST'])
 def gateway_management_delete():
-    return manage_operation('delete')
+    return manage_operation('delete', 'delete_file')
 
 
-@app.route('/admin', methods=['GET'])
-def gateway_admin():
-    auth_response = requests.post(
-        SERVICES['authentication'], json=request.get_json())
-    if auth_response.status_code == 200:
-        token_response = auth_response.json()
-        token = token_response.get('token')
-
-        roles = decode_token(token).get('role', '')
-
-        if roles == 'admin':
-            # Gọi dịch vụ Admin để xem thông tin database
-            admin_response = requests.get(
-                SERVICES['admin_service'], headers={'Authorization': f'Bearer {token}'}).text
-            return jsonify({'admin_response': admin_response})
-        else:
-            return jsonify({'error': 'Unauthorized'}), 403
-    else:
-        return jsonify({'error': 'Authentication failed'}), 401
+@app.route('/insert', methods=['POST'])
+def gateway_management_insert():
+    return manage_operation('insert', 'insert_file')
 
 
-def manage_operation(operation):
-    if request.method == 'GET':
-        return jsonify({'message': f'Management {operation} endpoint (GET)'})
-    elif request.method == 'POST':
-        auth_response = requests.post(
-            SERVICES['authentication'], json=request.get_json())
-        if auth_response.status_code == 200:
-            token_response = auth_response.json()
-            token = token_response.get('token')
-
-            roles = decode_token(token).get('role', '')
-
-            if roles == 'admin' or (roles == 'user' and operation == 'read'):
-                # Gọi dịch vụ Management với token và thực hiện operation
-                management_response = requests.post(
-                    SERVICES['management_service'],
-                    json={'token': token, 'operation': operation}).text
-                return jsonify({f'management_{operation}_response': management_response})
-            else:
-                return jsonify({'error': 'Unauthorized'}), 403
-        else:
-            return jsonify({'error': 'Authentication failed'}), 401
+@app.route('/allFile', methods=['GET'])
+def gateway_management_all_file():
+    return manage_operation('allFile', 'allFile')
 
 
 def decode_token(token):
