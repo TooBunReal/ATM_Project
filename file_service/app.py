@@ -1,4 +1,4 @@
-from flask import Flask, request, send_file
+from flask import Flask, request, send_file, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 from models import *
@@ -6,12 +6,11 @@ import os
 import json
 from operator import itemgetter
 
-#load_dotenv()
+load_dotenv()
 app = Flask(__name__)
-#app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("POSTGRESSQL_URI")
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://danu:05112003@localhost:5432/files'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("POSTGRESSQL_URI")
 db.init_app(app)
-#SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY")
 #ALGORITHM = os.getenv("ALGORITHM")
 
 
@@ -26,7 +25,7 @@ def insert_file():
         try:
             new_file = Files(
                 id=file.get('id'),
-                title=file.get('id'),
+                title=file.get('title'),
                 content=file.get('content')
             )
             new_files.append(new_file)
@@ -80,6 +79,7 @@ def get_all_file():
     files = Files.query.with_entities(Files.id, Files.title).all()
     file_list = [{"id": file.id, "title": file.title} for file in files]
     return json.dumps(file_list,default=str)
+    
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5003)
