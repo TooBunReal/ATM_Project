@@ -1,7 +1,8 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_restful import Api, Resource, reqparse
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 api = Api(app)
@@ -22,7 +23,6 @@ class UserModel(db.Model):
 with app.app_context():
     db.create_all()
 
-# User Registration
 class UserRegistration(Resource):
     def post(self):
         parser = reqparse.RequestParser()
@@ -32,13 +32,12 @@ class UserRegistration(Resource):
 
         if UserModel.query.filter_by(username=data['username']).first():
             return {'message': 'User already exists'}, 400
-
-        new_user = UserModel(username=data['username'], password=data['password'])
+        hashed_password = generate_password_hash(data['password'])
+        new_user = UserModel(username=data['username'], password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
         return {'message': 'User registered successfully'}, 201
 
-# User Login
 class UserLogin(Resource):
     def post(self):
         parser = reqparse.RequestParser()
@@ -48,19 +47,28 @@ class UserLogin(Resource):
 
         user = UserModel.query.filter_by(username=data['username']).first()
 
-        if user and user.password == data['password']:
+        if user and check_password_hash(user.password, data['password']):
             access_token = create_access_token(identity=data['username'])
             return {'access_token': access_token}, 200
 
         return {'message': 'Invalid credentials'}, 401
 
-# Protected Resource
 class ProtectedResource(Resource):
     @jwt_required()
     def get(self):
         current_user = get_jwt_identity()
         return {'message': 'You are accessing a protected resource', 'user': current_user}
-
+    
+@app.route('/wipe_database', methods=['POST'])
+def wipe_database():
+    try:
+        db.session.query(UserModel).delete()
+        db.session.commit()
+        return jsonify({'message': 'Database wiped successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+    
 api.add_resource(UserRegistration, '/register')
 api.add_resource(UserLogin, '/login')
 api.add_resource(ProtectedResource, '/protected')
