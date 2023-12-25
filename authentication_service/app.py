@@ -1,12 +1,69 @@
 from flask import Flask
+from flask_restful import Api, Resource, reqparse
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+api = Api(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///authen.db'
+app.config['JWT_SECRET_KEY'] = 'secret-key'
 
-@app.route('/serviceA')
-def service_a():
-    # Xử lý logic cho dịch vụ A
-    # ...
-    return 'Service A'
+db = SQLAlchemy(app)
+jwt = JWTManager(app)
+
+class UserModel(db.Model):
+    id = db.Column (db.Integer, primary_key=True)
+    username = db.Column (db.String(70), unique=True, nullable=False)
+    password = db.Column (db.String(70), nullable=False)
+
+    def __repr__(self):
+        return f"User(username={username}, password={password})"
+    
+with app.app_context():
+    db.create_all()
+
+# User Registration
+class UserRegistration(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('username', help='This field cannot be blank', required=True)
+        parser.add_argument('password', help='This field cannot be blank', required=True)
+        data = parser.parse_args()
+
+        if UserModel.query.filter_by(username=data['username']).first():
+            return {'message': 'User already exists'}, 400
+
+        new_user = UserModel(username=data['username'], password=data['password'])
+        db.session.add(new_user)
+        db.session.commit()
+        return {'message': 'User registered successfully'}, 201
+
+# User Login
+class UserLogin(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('username', help='This field cannot be blank', required=True)
+        parser.add_argument('password', help='This field cannot be blank', required=True)
+        data = parser.parse_args()
+
+        user = UserModel.query.filter_by(username=data['username']).first()
+
+        if user and user.password == data['password']:
+            access_token = create_access_token(identity=data['username'])
+            return {'access_token': access_token}, 200
+
+        return {'message': 'Invalid credentials'}, 401
+
+# Protected Resource
+class ProtectedResource(Resource):
+    @jwt_required()
+    def get(self):
+        current_user = get_jwt_identity()
+        return {'message': 'You are accessing a protected resource', 'user': current_user}
+
+api.add_resource(UserRegistration, '/register')
+api.add_resource(UserLogin, '/login')
+api.add_resource(ProtectedResource, '/protected')
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
