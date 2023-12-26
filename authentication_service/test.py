@@ -61,7 +61,7 @@ def test_protected_resource_access():
     print(f'Response JSON: {response.json()}')
 
 if __name__ == '__main__':
-    wipe_database()
+    #wipe_database()
     test_user_registration()
     test_user_login()
     test_protected_resource_access()
