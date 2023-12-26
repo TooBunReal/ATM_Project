@@ -1,0 +1,61 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    color: #333;
+}
+
+/* Index page styles */
+#index-content {
+    margin: 50px auto;
+    text-align: center;
+}
+
+/* Form styles */
+form {
+    margin-top: 20px;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="submit"] {
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+input[type="submit"] {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+/* Table styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th,
+table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ccc;
+}
+
+/* File list styles */
+#file-list {
+    margin: 50px auto;
+}
+
+#file-list th {
+    background-color: #333;
+    color: #fff;
+}
+
+#file-list td {
+    border-bottom: 1px solid #ccc;
+}

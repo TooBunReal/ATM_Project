@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Files</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+    <div id="all-files-content">
+        <h1>All Files</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>File ID</th>
+                    <th>File Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for file in files_data %}
+                <tr>
+                    <td>{{ file['id'] }}</td>
+                    <td>{{ file['title'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

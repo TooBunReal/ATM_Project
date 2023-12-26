@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, send_file, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 from models import *
@@ -11,7 +11,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("POSTGRESSQL_URI")
 db.init_app(app)
 SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = os.getenv("ALGORITHM")
+# ALGORITHM = os.getenv("ALGORITHM")
 
 
 @app.route('/api/insert_file', methods=['POST'])
@@ -25,7 +25,7 @@ def insert_file():
         try:
             new_file = Files(
                 id=file.get('id'),
-                title=file.get('id'),
+                title=file.get('title'),
                 content=file.get('content')
             )
             new_files.append(new_file)
@@ -65,21 +65,24 @@ def delete_file():
     return status
 
 
-@app.route('/api/read_file', methods=['GET'])
-def read_file():
-    files = Files.query.all()
-    file_list = [file.__dict__ for file in files]
-    for file in file_list:
-        file.pop('_sa_instance_state')
-    return json.dumps(file_list, default=str)
+@app.route('/api/read_file/<file_id>', methods=['GET'])
+def read_file(file_id):
+    file = Files.query.filter_by(id=file_id).first()
+    if file:
+        file_data = {
+            "id": file.id,
+            "title": file.title,
+            "content": file.content
+        }
+        return json.dumps(file_data, default=str)
+    else:
+        return json.dumps([{"status": "File not found", "status_code": "404"}]), 404
 
 
 @app.route('/api/allFile', methods=['GET'])
 def get_all_file():
-    files = Files.query.all()
-    file_list = [file.__dict__ for file in files]
-    for file in file_list:
-        file.pop('_sa_instance_state')
+    files = Files.query.with_entities(Files.id, Files.title).all()
+    file_list = [{"id": file.id, "title": file.title} for file in files]
     return json.dumps(file_list, default=str)
 
 

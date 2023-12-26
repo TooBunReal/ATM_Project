@@ -1,1 +1,19 @@
-
+version: '3'
+services:
+  frontend-service:
+    restart: always
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
+    volumes:
+      - .:/api-gateway
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+    depends_on:
+      - frontend-service

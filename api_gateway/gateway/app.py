@@ -1,5 +1,5 @@
 # api_gateway.py
-from flask import Flask, jsonify, request, redirect
+from flask import Flask, jsonify, request, redirect, render_template
 import jwt
 import requests
 from callAPI import manage_operation
@@ -10,13 +10,13 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def home():
-    return jsonify({'message': 'Welcome to the API Gateway!'})
+    return render_template('index.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def gateway_login():
     if request.method == 'GET':
-        return jsonify({'message': 'Login endpoint (GET)'})
+        return render_template('login.html')
     elif request.method == 'POST':
         auth_response = requests.post(
             SERVICES['authentication'], json=request.get_json())
@@ -31,7 +31,7 @@ def gateway_login():
 @app.route('/register', methods=['GET', 'POST'])
 def gateway_register():
     if request.method == 'GET':
-        return jsonify({'message': 'Register endpoint (GET)'})
+        return render_template('register.html')
     elif request.method == 'POST':
         return jsonify({'message': 'User registration endpoint'})
 
@@ -58,7 +58,11 @@ def gateway_management_insert():
 
 @app.route('/allFile', methods=['GET'])
 def gateway_management_all_file():
-    return manage_operation('allFile', 'allFile')
+    # sau đổi về url serive
+    response = requests.get('http://localhost:5003/api/allFile')
+    files_data = response.json()
+    print(files_data)
+    return render_template('allfile.html', files_data=files_data)
 
 
 def decode_token(token):
