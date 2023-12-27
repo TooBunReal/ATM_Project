@@ -18,12 +18,16 @@ def gateway_login():
     if request.method == 'GET':
         return render_template('login.html')
     elif request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
         auth_response = requests.post(
-            SERVICES['authentication'], json=request.get_json())
+            f"http://localhost:5002/api/login", json={'username': username, 'password': password}
+        )
+
         if auth_response.status_code == 200:
-            token_response = auth_response.json()
-            token = token_response.get('token')
-            return jsonify({'token': token})
+            data = auth_response.json()
+            return jsonify({'data': data})
         else:
             return jsonify({'error': 'Authentication failed'}), 401
 
@@ -33,7 +37,16 @@ def gateway_register():
     if request.method == 'GET':
         return render_template('register.html')
     elif request.method == 'POST':
-        return jsonify({'message': 'User registration endpoint'})
+        username = request.form.get('username')
+        password = request.form.get('password')
+        auth_response = requests.post(
+            f"http://localhost:5002/api/register", json={'username': username, 'password': password}
+        )
+
+        if auth_response.status_code == 200:
+            return jsonify({'message': 'User registration successful'})
+        else:
+            return jsonify({'error': 'User registration failed'}), 500
 
 
 @app.route('/read/<file_id>', methods=['GET'])
