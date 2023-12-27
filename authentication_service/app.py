@@ -8,7 +8,7 @@ import os
 import json
 import re
 import jwt
-from conf import settings
+#from conf import settings
 
 load_dotenv()
 app = Flask(__name__)
@@ -27,9 +27,9 @@ def signup():
 
     if not re.match("^[a-zA-Z0-9_]{1,200}$", username):
         return json.dumps({"status":"The username should match this regular expression '^[a-zA-Z0-9_]{1,200}$'","status_code":500})
-    user = User.query.filter_by(username=username).first()
+    user = users.query.filter_by(username=username).first()
     try:
-        user = User(username, generate_password_hash(password))
+        user = users(username, generate_password_hash(password))
         db.session.add(user)
         db.session.commit()
     except Exception as e:
@@ -42,10 +42,13 @@ def signin():
     username = request.form.get('username', '')
     if not re.match("^[a-zA-Z0-9_]{1,200}$", username):
         return json.dumps({"status":"The username should match this regular expression '^[a-zA-Z0-9_]{1,200}$'","status_code":500})
-    user = User.query.filter_by(username=username).first()
+    user = users.query.filter_by(username=username).first()
     if not user:
         return json.dumps({"status":"Invalid username", "status_code":404})
     if not check_password_hash(user.password, request.form.get('password', '')):
         return json.dumps({"status":"Invalid password", "status_code":403})
     ret = {"userid":user.userid, "role":user.role}
     return json.dumps(ret)
+    
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5002)
