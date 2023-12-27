@@ -1,14 +1,12 @@
+import json
+import os
+import re
+
+from dotenv import load_dotenv
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
-from dotenv import load_dotenv
-from werkzeug.security import generate_password_hash, check_password_hash
 from models import *
-import os
-import json
-import re
-import jwt
-import time
-#from conf import settings
+from werkzeug.security import check_password_hash, generate_password_hash
 
 load_dotenv()
 app = Flask(__name__)
@@ -16,7 +14,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("POSTGRESSQL_URI")
 db.init_app(app)
 SECRET_KEY = os.getenv("SECRET_KEY")
 #ALGORITHM = os.getenv("ALGORITHM")
-ISSUER = 'sample-auth-server'
+ISSUER = 'authen-server'
 LIFE_SPAN = 1800
 
 
@@ -50,18 +48,9 @@ def signin():
         return json.dumps({"status":"Invalid username", "status_code":404})
     if not check_password_hash(user.password, password):
         return json.dumps({"status":"Invalid password", "status_code":403})
-    
-    payload = {
-        "iss": ISSUER,
-        "exp": time.time() + LIFE_SPAN,
+    return json.dumps({ 
         "userid":user.userid,
         "role":user.role
-    }
-    token = jwt.encode(payload, SECRET_KEY, algorithm = 'HS256')
-    return json.dumps({ 
-        "authorization_token": token,
-        "token_type": "JWT",
-        "expires_in": LIFE_SPAN
     })
 
 if __name__ == '__main__':
