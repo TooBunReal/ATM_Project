@@ -17,7 +17,7 @@
             <tbody>
                 {% for file in files_data %}
                 <tr>
-                    <td>{{ file['id'] }}</td>
+                    <td><a href="/read/{{ file['id'] }}">{{ file['id'] }}</a></td>
                     <td>{{ file['title'] }}</td>
                 </tr>
                 {% endfor %}

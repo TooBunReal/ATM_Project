@@ -11,10 +11,10 @@ COPY requirements.txt .
 # Cài đặt các dependencies từ requirements.txt
 RUN pip install -r requirements.txt
 
-COPY . /file-service
+COPY . .
 
 # Expose cổng mà ứng dụng của bạn chạyz
 EXPOSE 5003
 
 # Command để chạy ứng dụng của bạn khi container được khởi chạy
-CMD ["gunicorn3", "--bind", "0.0.0.0:5003", "app:app"]
+CMD ["python3", "app.py"]

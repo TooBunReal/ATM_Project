@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Read File</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+    <div id="read-file-content">
+        <h1>File Details</h1>
+        <p><strong>File ID:</strong> {{ file_data['id'] }}</p>
+        <p><strong>File Title:</strong> {{ file_data['title'] }}</p>
+        <p><strong>File Content:</strong> {{ file_data['content'] }}</p>
+
+        <!-- Form for Delete button -->
+        <form action="/delete/{{ file_data['id'] }}" method="post" style="display: inline;">
+            <button type="submit">Xóa</button>
+        </form>
+
+        <!-- Form for Edit button -->
+        <form action="/edit/{{ file_data['id'] }}" method="get" style="display: inline;">
+            <button type="submit">Sửa</button>
+        </form>
+    </div>
+</body>
+</html>

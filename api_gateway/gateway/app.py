@@ -36,9 +36,12 @@ def gateway_register():
         return jsonify({'message': 'User registration endpoint'})
 
 
-@app.route('/read', methods=['GET', 'POST'])
-def gateway_management_read():
-    return manage_operation('read', 'read_file')
+@app.route('/read/<file_id>', methods=['GET'])
+def gateway_management_read(file_id):
+    response = requests.get(f'http://localhost:5003/api/read_file/{file_id}')
+    file_data = response.json()
+    print(file_data)
+    return render_template('readfile.html', file_data=file_data)
 
 
 @app.route('/update', methods=['GET', 'POST'])
