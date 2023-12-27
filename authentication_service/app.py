@@ -8,6 +8,7 @@ import os
 import json
 import re
 import jwt
+import time
 # from conf import settings
 
 load_dotenv()
@@ -15,6 +16,8 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("POSTGRESSQL_URI")
 db.init_app(app)
 SECRET_KEY = os.getenv("SECRET_KEY")
+ISSUER = os.getenv("ISSUER")
+LIFE_SPAN = os.getenv("LIFE_SPAN")
 # ALGORITHM = os.getenv("ALGORITHM")
 
 
@@ -51,8 +54,8 @@ def signin():
         return json.dumps({"status": "Invalid username", "status_code": 404})
     if not check_password_hash(user.password, password):
         return json.dumps({"status": "Invalid password", "status_code": 403})
-    ret = {"userid": user.userid, "role": user.role}
-    return json.dumps(ret)
+
+    return json.dumps({"userid": user.userid, "role": user.role})
 
 
 if __name__ == '__main__':
