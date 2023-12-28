@@ -23,7 +23,7 @@ spec:
           image: danuxpeach/file-service:lastest
           imagePullPolicy: "Always"
           ports:
-            - containerPort: 5005
+            - containerPort: 5003
           envFrom:
             - configMapRef:
                 name: fileservice-configmap
