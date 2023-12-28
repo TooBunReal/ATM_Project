@@ -11,9 +11,6 @@ load_dotenv()
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("POSTGRESSQL_URI")
 db.init_app(app)
-SECRET_KEY = os.getenv("SECRET_KEY")
-ISSUER = os.getenv("ISSUER")
-LIFE_SPAN = os.getenv("LIFE_SPAN")
 # ALGORITHM = os.getenv("ALGORITHM")
 
 

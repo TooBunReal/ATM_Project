@@ -1,18 +1,18 @@
 import json
 import os
 import time
-
 import jwt
-
 from dotenv import load_dotenv
 from flask import Flask, request
-load_dotenv()
 
-ISSUER = "sample-auth-server"
-LIFE_SPAN = 1800
+load_dotenv()
 
 os.getenv("POSTGRESSQL_URI")
 SECRET_KEY = os.getenv("SECRET_KEY")
+LIFE_SPAN = int(os.getenv("LIFE_SPAN"))
+ISSUER = os.getenv("ISSUER")
+ALGORITHMS = os.getenv("ALGORITHMS")
+
 app = Flask(__name__)
 
 
@@ -34,7 +34,7 @@ def auth():
             "scope": scope,
         }
 
-        access_token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+        access_token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHMS)
         return (
             json.dumps(
                 {

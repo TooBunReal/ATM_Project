@@ -5,12 +5,14 @@ import requests
 from dotenv import load_dotenv
 import os
 from service import SERVICES
+from datetime import datetime, timezone
 
 load_dotenv()
 
 app = Flask(__name__)
 
 SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHMS = os.getenv("ALGORITHMS")
 
 
 @app.route('/', methods=['GET'])
@@ -35,9 +37,9 @@ def gateway_login():
     elif request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-
+        url = os.getenv('AUTHENTICATION_SERVICE_URL') + '/api/login'
         authen_response = requests.post(
-            f"http://authentication_service:5002/api/login", json={'username': username, 'password': password}
+            url, json={'username': username, 'password': password}
         )
         if authen_response.status_code == 200:
             data = authen_response.json()
@@ -47,7 +49,7 @@ def gateway_login():
             print(userid)
             print(role)
             author_response = requests.post(
-                f"http://authorization_service:5005/auth", json={'userid': userid, 'role': role}
+                os.getenv('AUTHORIZATION_SERVICE_URL'), json={'userid': userid, 'role': role}
             )
             if author_response.status_code == 200:
                 token = author_response.json()
@@ -77,8 +79,9 @@ def gateway_register():
     elif request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
+        url = os.getenv('AUTHENTICATION_SERVICE_URL') + '/api/register'
         auth_response = requests.post(
-            f"http://authentication_service:5002/api/register", json={'username': username, 'password': password}
+            url, json={'username': username, 'password': password}
         )
 
         if auth_response.status_code == 200:
@@ -95,8 +98,8 @@ def gateway_management_read(file_id):
     token = request.cookies.get('access_token')
     check, payload = decode_token(token)
     if (check):
-        response = requests.get(
-            f'http://file_service:5003/api/read_file/{file_id}')
+        url = os.getenv('FILE_SERVICE_URL') + f'/api/read_file/{file_id}'
+        response = requests.get(url)
         file_data = response.json()
         print(file_data)
         return render_template('readfile.html', file_data=file_data)
@@ -113,8 +116,8 @@ def gateway_management_delete(file_id):
         if scope == "admin_scope":
             if request.method == 'POST':
                 data_to_send = {"id": file_id}
-            response = requests.post(
-                'http://file_service:5003/api/delete_file', json=[data_to_send])
+            url = os.getenv('FILE_SERVICE_URL') + f'/api/delete_file'
+            response = requests.post(url, json=[data_to_send])
             status = response.json()
 
             for item in status:
@@ -135,9 +138,8 @@ def gateway_management_insert():
         "title": file_title,
         "content": file_content
     }
-
-    response = requests.post(
-        'http://file_service:5003/api/insert_file', json=[data_to_send])
+    url = os.getenv('FILE_SERVICE_URL') + f'/api/insert_file'
+    response = requests.post(url, json=[data_to_send])
     status = response.json()
 
     for item in status:
@@ -151,7 +153,8 @@ def gateway_management_all_file():
     token = request.cookies.get('access_token')
     check, payload = decode_token(token)
     if (check):
-        response = requests.get('http://file_service:5003/api/allFile')
+        url = os.getenv('FILE_SERVICE_URL') + '/api/allFile'
+        response = requests.get(url)
         files_data = response.json()
         print(files_data)
         return render_template('allfile.html', files_data=files_data)
@@ -169,13 +172,13 @@ def gateway_management_feedback():
     if (check):
         scope = payload.get("scope")
         if scope == "admin_scope":
-            response = requests.get(
-                'http://feedback_service:5001/api/allfeedback')
+            url = os.getenv('FEEDBACK_SERVICE_URL') + '/api/allfeedback'
+            response = requests.get(url)
             feedbacks_data = response.json()
             print(feedbacks_data)
             return render_template('allfeedback.html', feedbacks_data=feedbacks_data)
         else:
-            return render_template('insertfeedback.html')
+            return render_template('insert_feedback.html')
     else:
         return redirect('/login')
 
@@ -190,9 +193,8 @@ def gateway_management_insert_feedback():
         "name": feedback_name,
         "content": feedback_content
     }
-
-    response = requests.post(
-        'http://feedback_service:5001/api/insert_feedback', json=[data_to_send])
+    url = os.getenv('FEEDBACK_SERVICE_URL') + '/api/insert_feedback'
+    response = requests.post(url, json=[data_to_send])
     status = response.json()
 
     for item in status:
@@ -204,8 +206,11 @@ def gateway_management_insert_feedback():
 
 def decode_token(token):
     try:
-        decoded_token = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        decoded_token = jwt.decode(
+            token, SECRET_KEY, algorithms=ALGORITHMS)
         return True, decoded_token
+    except jwt.ExpiredSignatureError:
+        return False, "Token has expired"
     except jwt.InvalidTokenError:
         return False, "Invalid token"
 
