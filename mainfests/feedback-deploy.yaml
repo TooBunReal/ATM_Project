@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: feedbackservice
+  labels:
+    app: feedbackservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: feedbackservice
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 3
+  template:
+    metadata:
+      labels:
+        app: feedbackservice
+    spec:
+      containers:
+        - name: feedbackservice
+          image: danuxpeach/feedback-service:lastest
+          imagePullPolicy: "Always"
+          ports:
+            - containerPort: 5001
+          envFrom:
+            - configMapRef:
+                name: feedbackservice-configmap

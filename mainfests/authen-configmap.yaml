@@ -7,3 +7,4 @@ data:
   SECRET_KEY: d1g1t4l_dr4g0n_1s_th3_b3st_ctf
   ISSUER: 'sample-auth-server'
   LIFE_SPAN: "1800"
+  ALGORITHMS: HS256

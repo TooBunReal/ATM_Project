@@ -37,7 +37,7 @@ def gateway_login():
     elif request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        url = os.getenv('AUTHENTICATION_SERVICE_URL') + '/api/login'
+        url = f"http://{os.getenv('AUTHENTICATION_SERVICE_URL')}/api/login"
         authen_response = requests.post(
             url, json={'username': username, 'password': password}
         )
@@ -49,7 +49,7 @@ def gateway_login():
             print(userid)
             print(role)
             author_response = requests.post(
-                os.getenv('AUTHORIZATION_SERVICE_URL'), json={'userid': userid, 'role': role}
+                f"http://{os.getenv('AUTHORIZATION_SERVICE_URL')}/auth", json={'userid': userid, 'role': role}
             )
             if author_response.status_code == 200:
                 token = author_response.json()
@@ -79,7 +79,7 @@ def gateway_register():
     elif request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        url = os.getenv('AUTHENTICATION_SERVICE_URL') + '/api/register'
+        url = f"http://{os.getenv('AUTHENTICATION_SERVICE_URL')}/api/register"
         auth_response = requests.post(
             url, json={'username': username, 'password': password}
         )
@@ -98,7 +98,7 @@ def gateway_management_read(file_id):
     token = request.cookies.get('access_token')
     check, payload = decode_token(token)
     if (check):
-        url = os.getenv('FILE_SERVICE_URL') + f'/api/read_file/{file_id}'
+        url = f"http://{os.getenv('FILE_SERVICE_URL')}/api/read_file/{file_id}"
         response = requests.get(url)
         file_data = response.json()
         print(file_data)
@@ -116,7 +116,7 @@ def gateway_management_delete(file_id):
         if scope == "admin_scope":
             if request.method == 'POST':
                 data_to_send = {"id": file_id}
-            url = os.getenv('FILE_SERVICE_URL') + f'/api/delete_file'
+            url = f"http://{os.getenv('FILE_SERVICE_URL')}/api/delete_file"
             response = requests.post(url, json=[data_to_send])
             status = response.json()
 
@@ -138,7 +138,7 @@ def gateway_management_insert():
         "title": file_title,
         "content": file_content
     }
-    url = os.getenv('FILE_SERVICE_URL') + f'/api/insert_file'
+    url = f"http://{os.getenv('FILE_SERVICE_URL')}/api/insert_file"
     response = requests.post(url, json=[data_to_send])
     status = response.json()
 
@@ -153,7 +153,7 @@ def gateway_management_all_file():
     token = request.cookies.get('access_token')
     check, payload = decode_token(token)
     if (check):
-        url = os.getenv('FILE_SERVICE_URL') + '/api/allFile'
+        url = f"http://{os.getenv('FILE_SERVICE_URL')}/api/allFile"
         response = requests.get(url)
         files_data = response.json()
         print(files_data)
@@ -172,7 +172,7 @@ def gateway_management_feedback():
     if (check):
         scope = payload.get("scope")
         if scope == "admin_scope":
-            url = os.getenv('FEEDBACK_SERVICE_URL') + '/api/allfeedback'
+            url = f"http://{os.getenv('FEEDBACK_SERVICE_URL')}/api/allfeedback"
             response = requests.get(url)
             feedbacks_data = response.json()
             print(feedbacks_data)
@@ -193,7 +193,7 @@ def gateway_management_insert_feedback():
         "name": feedback_name,
         "content": feedback_content
     }
-    url = os.getenv('FEEDBACK_SERVICE_URL') + '/api/insert_feedback'
+    url = f"http://{os.getenv('FEEDBACK_SERVICE_URL')}/api/insert_feedback"
     response = requests.post(url, json=[data_to_send])
     status = response.json()
 
