@@ -7,6 +7,18 @@
 <body>
     <div id="all-files-content">
         <h1>All Files</h1>
+        <button id="add-file-btn">Thêm File</button>
+        <div id="file-form" style="display: none;">
+            <form id="file-form-data" method="POST" action="/insert">
+                <label for="file-id">ID:</label>
+                <input type="text" id="file-id" name="id"><br><br>
+                <label for="file-title">Title:</label>
+                <input type="text" id="file-title" name="title"><br><br>
+                <label for="file-content">Content:</label>
+                <textarea id="file-content" name="content"></textarea><br><br>
+                <input type="submit" value="Submit">
+            </form>
+        </div>
         <table>
             <thead>
                 <tr>
@@ -24,5 +36,11 @@
             </tbody>
         </table>
     </div>
+
+    <script>
+        document.getElementById('add-file-btn').addEventListener('click', function() {
+            document.getElementById('file-form').style.display = 'block';
+        });
+    </script>
 </body>
 </html>

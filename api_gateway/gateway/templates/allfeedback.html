@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Feedbacks</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+    <div id="all-feedbacks-content">
+        <h1>All Feedbacks</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Feedback ID</th>
+                    <th>Name</th>
+                    <th>Content</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for feedback in feedbacks_data %}
+                <tr>
+                    <td>{{ feedback['feedback_id'] }}</a></td>
+                    <td>{{ feedback['name'] }}</td>
+                    <td>{{ feedback['content'] }}</td>
+                    <td>{{ feedback['date'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

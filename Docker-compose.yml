@@ -10,16 +10,16 @@ services:
     volumes:
       - .:/api-gateway
 
-  nginx:
-    build:
-      context: ./api_gateway/nginx
-      dockerfile: Dockerfile
-    ports:
-      - 8080:8080
-    depends_on:
-      - frontend-service
+  # nginx:
+  #   build:
+  #     context: ./api_gateway/nginx
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - 8080:8080
+  #   depends_on:
+  #     - frontend-service
 
-  about_service:
+  file-services:
     container_name: file-services
     build:
       context: ./file_service
@@ -30,3 +30,15 @@ services:
       - ./file_service/.env
     volumes:
       - .:/file-service
+
+  authentication_service:
+    container_name: authentication_service
+    build:
+      context: ./authentication_service
+      dockerfile: Dockerfile
+    ports:
+      - 5002:5002
+    env_file:
+      - ./authentication_service/.env
+    volumes:
+      - .:/authentication_service

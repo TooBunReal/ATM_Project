@@ -53,6 +53,12 @@ def gateway_login():
             return jsonify({'error': 'Authentication failed'}), 401
 
 
+@app.route('/logout', methods=['GET'])
+def logout():
+    response.delete_cookie('cookie_name', domain="cookie_domain")
+    return response
+
+
 @app.route('/register', methods=['GET', 'POST'])
 def gateway_register():
     if request.method == 'GET':
@@ -69,6 +75,8 @@ def gateway_register():
         else:
             return jsonify({'error': 'User registration failed'}), 500
 
+# region file
+
 
 @app.route('/read/<file_id>', methods=['GET'])
 def gateway_management_read(file_id):
@@ -78,19 +86,46 @@ def gateway_management_read(file_id):
     return render_template('readfile.html', file_data=file_data)
 
 
-@app.route('/update', methods=['GET', 'POST'])
-def gateway_management_update():
-    return manage_operation('update', 'update_file')
+@app.route('/delete/<file_id>', methods=['POST'])
+def gateway_management_delete(file_id):
+    token = request.cookies.get('access_token')
+    check, payload = decode_token(token)
+    if (check):
+        scope = payload.get("scope")
+        if scope == "admin_scope":
+            if request.method == 'POST':
+                data_to_send = {"id": file_id}
+            response = requests.post(
+                'http://localhost:5003/api/delete_file', json=[data_to_send])
+            status = response.json()
 
-
-@app.route('/delete', methods=['GET', 'POST'])
-def gateway_management_delete():
-    return manage_operation('delete', 'delete_file')
+            for item in status:
+                if item['status_code'] == "200":
+                    return redirect('/allFile')
+    return jsonify({'message': 'Delete failed!'})
 
 
 @app.route('/insert', methods=['POST'])
 def gateway_management_insert():
-    return manage_operation('insert', 'insert_file')
+    if request.method == 'POST':
+        file_id = request.form['id']
+        file_title = request.form['title']
+        file_content = request.form['content']
+
+    data_to_send = {
+        "id": file_id,
+        "title": file_title,
+        "content": file_content
+    }
+
+    response = requests.post(
+        'http://localhost:5003/api/insert_file', json=[data_to_send])
+    status = response.json()
+
+    for item in status:
+        if item['status_code'] == "200":
+            return redirect('/allFile')
+    return jsonify({'message': 'Insert failed!'})
 
 
 @app.route('/allFile', methods=['GET'])
@@ -104,6 +139,48 @@ def gateway_management_all_file():
         return render_template('allfile.html', files_data=files_data)
     else:
         return redirect('/login')
+# endregion
+
+# region feedback
+
+
+@app.route('/feedback', methods=['GET'])
+def gateway_management_feedback():
+    token = request.cookies.get('access_token')
+    check, payload = decode_token(token)
+    if (check):
+        scope = payload.get("scope")
+        if scope == "admin_scope":
+            response = requests.get('http://localhost:5001/api/allfeedback')
+            feedbacks_data = response.json()
+            print(feedbacks_data)
+            return render_template('allfeedback.html', feedbacks_data=feedbacks_data)
+        else:
+            return render_template('insertfeedback.html')
+    else:
+        return redirect('/login')
+
+
+@app.route('/insert_feedback', methods=['POST'])
+def gateway_management_insert_feedback():
+    if request.method == 'POST':
+        feedback_name = request.form['name']
+        feedback_content = request.form['content']
+
+    data_to_send = {
+        "name": feedback_name,
+        "content": feedback_content
+    }
+
+    response = requests.post(
+        'http://localhost:5001/api/insert_feedback', json=[data_to_send])
+    status = response.json()
+
+    for item in status:
+        if item['status_code'] == "200":
+            return redirect('/feedback')
+    return jsonify({'message': 'Insert failed!'})
+# endregion
 
 
 def decode_token(token):

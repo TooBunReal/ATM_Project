@@ -1,0 +1,5 @@
+gunicorn==20.1.0
+Flask==2.0.1
+PyJWT==2.8.0
+python-dotenv==1.0.0
+psycopg2==2.9.6
