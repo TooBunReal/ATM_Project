@@ -23,7 +23,7 @@ def insert_feedback():
     status = []
     for feedback in feedbacks_json:
         try:
-            new_feedback = feedbacks(
+            new_feedback = Feedbacks(
                 name=feedback.get('name'),
                 content=feedback.get('content')
             )
@@ -47,11 +47,11 @@ def delete_feedback():
     for feedback_ids in feedbacks_json:
         try:
             get_id = feedback_ids.get('id')
-            feedback_query = feedbacks.query.get(get_id)
+            feedback_query = Feedbacks.query.get(get_id)
             if (feedback_query == None):
                 raise Exception
             else:
-                feedbacks.query.filter_by(feedback_id=get_id).delete()
+                Feedbacks.query.filter_by(feedback_id=get_id).delete()
                 status.append(
                     {"status": f"feedback ID {get_id} deleted successfully", "status_code": "200"})
         except:
@@ -64,7 +64,7 @@ def delete_feedback():
 
 @app.route('/api/allfeedback', methods=['GET'])
 def get_all_feedback():
-    feedbacks = feedbacks.query.all()
+    feedbacks = Feedbacks.query.all()
     feedback_list  = [feedback.__dict__ for feedback in feedbacks]
     for feedback in feedback_list:
         feedback.pop('_sa_instance_state')
