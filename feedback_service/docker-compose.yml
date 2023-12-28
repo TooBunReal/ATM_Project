@@ -10,4 +10,4 @@ services:
     env_file:
       - .env
     volumes:
-      - ./feedback_service
+      - .:/feedback_service

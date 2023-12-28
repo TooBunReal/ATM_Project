@@ -20,6 +20,17 @@ services:
     depends_on:
       - api_gateway_frontend_service
 
+  feedback_service:
+    extends:
+      file: ./feedback_service/docker-compose.yml
+      service: feedback_service
+    ports:
+      - 5001:5001
+    env_file:
+      - ./feedback_service/.env
+    volumes:
+      - .:/feedback_service
+
   file_service:
     extends:
       file: ./file_service/docker-compose.yml

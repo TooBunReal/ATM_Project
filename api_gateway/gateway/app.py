@@ -4,7 +4,6 @@ import jwt
 import requests
 from dotenv import load_dotenv
 import os
-from callAPI import manage_operation
 from service import SERVICES
 
 load_dotenv()
@@ -19,6 +18,16 @@ def home():
     return render_template('index.html')
 
 
+@app.route('/dashboard', methods=['GET'])
+def dashboard():
+    token = request.cookies.get('access_token')
+    check, payload = decode_token(token)
+    if (check):
+        return render_template('dashboard.html')
+    else:
+        return redirect('/login')
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def gateway_login():
     if request.method == 'GET':
@@ -30,7 +39,6 @@ def gateway_login():
         authen_response = requests.post(
             f"http://authentication_service:5002/api/login", json={'username': username, 'password': password}
         )
-# khi nao co author thi send data qua thang author
         if authen_response.status_code == 200:
             data = authen_response.json()
             print(data)
@@ -44,19 +52,22 @@ def gateway_login():
             if author_response.status_code == 200:
                 token = author_response.json()
                 access_token = token['access_token']
-                response = make_response(redirect('/allFile'))
+                response = make_response(redirect('/dashboard'))
                 response.set_cookie('access_token', access_token)
                 return response
             else:
-                return jsonify({'error': 'Authorization failed'}), 401
+                print('error: Authorization failed')
+                return redirect('/login')
         else:
-            return jsonify({'error': 'Authentication failed'}), 401
+            print('error : Authentication failed')
+            return redirect('/login')
 
 
-# @app.route('/logout', methods=['GET'])
-# def logout():
-#     response.delete_cookie('cookie_name', domain="cookie_domain")
-#     return response
+@app.route('/logout', methods=['GET'])
+def logout():
+    response = make_response(redirect('/login'))
+    response.delete_cookie('access_token')
+    return response
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -71,20 +82,26 @@ def gateway_register():
         )
 
         if auth_response.status_code == 200:
-            return jsonify({'message': 'User registration successful'})
+            return redirect('/login')
         else:
-            return jsonify({'error': 'User registration failed'}), 500
+            print('error : User registration failed')
+            return redirect('/register')
 
 # region file
 
 
 @app.route('/read/<file_id>', methods=['GET'])
 def gateway_management_read(file_id):
-    response = requests.get(
-        f'http://file_service:5003/api/read_file/{file_id}')
-    file_data = response.json()
-    print(file_data)
-    return render_template('readfile.html', file_data=file_data)
+    token = request.cookies.get('access_token')
+    check, payload = decode_token(token)
+    if (check):
+        response = requests.get(
+            f'http://file_service:5003/api/read_file/{file_id}')
+        file_data = response.json()
+        print(file_data)
+        return render_template('readfile.html', file_data=file_data)
+    else:
+        return redirect('/login')
 
 
 @app.route('/delete/<file_id>', methods=['POST'])
