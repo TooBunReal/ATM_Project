@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authen
+  labels:
+    app: authen
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authen
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 3
+  template:
+    metadata:
+      labels:
+        app: authen
+    spec:
+      containers:
+        - name: authen
+          image: danuxpeach/authentication:lastest
+          imagePullPolicy: "Always"
+          ports:
+            - containerPort: 5002
+          envFrom:
+            - configMapRef:
+                name: authen-configmap

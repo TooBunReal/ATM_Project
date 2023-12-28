@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fileservice
+  labels:
+    app: fileservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fileservice
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 3
+  template:
+    metadata:
+      labels:
+        app: fileservice
+    spec:
+      containers:
+        - name: fileservice
+          image: danuxpeach/file-service:lastest
+          imagePullPolicy: "Always"
+          ports:
+            - containerPort: 5005
+          envFrom:
+            - configMapRef:
+                name: fileservice-configmap
