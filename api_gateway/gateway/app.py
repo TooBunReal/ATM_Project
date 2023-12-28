@@ -138,8 +138,9 @@ def gateway_management_feedback():
         scope = payload.get("scope")
         if scope == "admin_scope":
             response = requests.get('http://localhost:5001/api/allfeedback')
-            files_data = response.json()
-            return render_template('allfeedback.html', files_data=files_data)
+            feedbacks_data = response.json()
+            print(feedbacks_data)
+            return render_template('allfeedback.html', feedbacks_data=feedbacks_data)
         else:
             return render_template('insertfeedback.html')
     else:
