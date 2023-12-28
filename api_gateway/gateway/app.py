@@ -77,20 +77,43 @@ def gateway_management_read(file_id):
     print(file_data)
     return render_template('readfile.html', file_data=file_data)
 
-
-@app.route('/update', methods=['GET', 'POST'])
-def gateway_management_update():
-    return manage_operation('update', 'update_file')
-
-
-@app.route('/delete', methods=['GET', 'POST'])
-def gateway_management_delete():
-    return manage_operation('delete', 'delete_file')
-
+@app.route('/delete/<file_id>', methods=['POST'])
+def gateway_management_delete(file_id):
+    token = request.cookies.get('access_token')
+    check, payload = decode_token(token)
+    if (check):
+        scope = payload.get("scope")
+        if scope == "admin_scope":
+            if request.method == 'POST':
+                data_to_send = {"id": file_id}
+            response = requests.post('http://localhost:5003/api/delete_file', json=[data_to_send])
+            status = response.json()
+            
+            for item in status:
+                if item['status_code'] == "200":
+                    return redirect('/allFile')
+    return jsonify({'message': 'Delete failed!'})
 
 @app.route('/insert', methods=['POST'])
 def gateway_management_insert():
-    return manage_operation('insert', 'insert_file')
+    if request.method == 'POST':
+        file_id = request.form['id']
+        file_title = request.form['title']
+        file_content = request.form['content']
+
+    data_to_send = {
+        "id": file_id,
+        "title": file_title,
+        "content": file_content
+    }
+
+    response = requests.post('http://localhost:5003/api/insert_file', json=[data_to_send])
+    status = response.json()
+    
+    for item in status:
+            if item['status_code'] == "200":
+                return redirect('/allFile')
+    return jsonify({'message': 'Insert failed!'})
 
 
 @app.route('/allFile', methods=['GET'])
