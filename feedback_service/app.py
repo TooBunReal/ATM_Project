@@ -38,29 +38,29 @@ def insert_feedback():
     return json.dumps(status)
 
 
-@app.route('/api/delete_feedback', methods=['POST'])
-def delete_feedback():
-    feedbacks_json = request.get_json()
-    status = []
-    if not isinstance(feedbacks_json, list):
-        return json.dumps({"status": "Invalid payload format. Expected a list of feedbacks", "status_code": "400"})
-    for feedback_ids in feedbacks_json:
-        try:
-            get_id = feedback_ids.get('id')
-            feedback_query = Feedbacks.query.get(get_id)
-            if (feedback_query == None):
-                raise Exception
-            else:
-                Feedbacks.query.filter_by(feedback_id=get_id).delete()
-                status.append(
-                    {"status": f"feedback ID {get_id} deleted successfully", "status_code": "200"})
-        except:
-            status.append(
-                {"status": f"feedback ID {get_id} not found", "status_code": "404"})
+# @app.route('/api/delete_feedback', methods=['POST'])
+# def delete_feedback():
+#     feedbacks_json = request.get_json()
+#     status = []
+#     if not isinstance(feedbacks_json, list):
+#         return json.dumps({"status": "Invalid payload format. Expected a list of feedbacks", "status_code": "400"})
+#     for feedback_ids in feedbacks_json:
+#         try:
+#             get_id = feedback_ids.get('id')
+#             feedback_query = Feedbacks.query.get(get_id)
+#             if (feedback_query == None):
+#                 raise Exception
+#             else:
+#                 Feedbacks.query.filter_by(feedback_id=get_id).delete()
+#                 status.append(
+#                     {"status": f"feedback ID {get_id} deleted successfully", "status_code": "200"})
+#         except:
+#             status.append(
+#                 {"status": f"feedback ID {get_id} not found", "status_code": "404"})
 
-        db.session.commit()
+#         db.session.commit()
 
-    return status
+#     return status
 
 @app.route('/api/allfeedback', methods=['GET'])
 def get_all_feedback():
