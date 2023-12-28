@@ -69,7 +69,7 @@ def gateway_register():
         else:
             return jsonify({'error': 'User registration failed'}), 500
 
-
+#region file
 @app.route('/read/<file_id>', methods=['GET'])
 def gateway_management_read(file_id):
     response = requests.get(f'http://localhost:5003/api/read_file/{file_id}')
@@ -127,7 +127,43 @@ def gateway_management_all_file():
         return render_template('allfile.html', files_data=files_data)
     else:
         return redirect('/login')
+#endregion
 
+#region feedback
+@app.route('/feedback', methods=['GET'])
+def gateway_management_feedback():
+    token = request.cookies.get('access_token')
+    check, payload = decode_token(token)
+    if (check):
+        scope = payload.get("scope")
+        if scope == "admin_scope":
+            response = requests.get('http://localhost:5001/api/allfeedback')
+            files_data = response.json()
+            return render_template('allfeedback.html', files_data=files_data)
+        else:
+            return render_template('insertfeedback.html')
+    else:
+        return redirect('/login')
+
+@app.route('/insert_feedback', methods=['POST'])
+def gateway_management_insert_feedback():
+    if request.method == 'POST':
+        feedback_name = request.form['name']
+        feedback_content = request.form['content']
+
+    data_to_send = {
+        "name": feedback_name,
+        "content": feedback_content
+    }
+
+    response = requests.post('http://localhost:5001/api/insert_feedback', json=[data_to_send])
+    status = response.json()
+    
+    for item in status:
+            if item['status_code'] == "200":
+                return redirect('/feedback')
+    return jsonify({'message': 'Insert failed!'})
+#endregion
 
 def decode_token(token):
     try:
