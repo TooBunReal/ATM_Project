@@ -1,9 +1,8 @@
-
+# Sử dụng base image Python
 FROM ubuntu:22.04 as apt-deps
-
 RUN apt-get update && apt install -y gunicorn3 python3-pip libpq-dev
-FROM ubuntu:22.04
 
+FROM ubuntu:22.04
 COPY --from=apt-deps / /
 
 WORKDIR /feedback-service

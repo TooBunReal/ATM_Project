@@ -1,14 +1,10 @@
-from flask import Flask, request, render_template, redirect, abort, url_for, send_from_directory, make_response, jsonify
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, request
 from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime, timedelta
 from models import *
 import os
 import json
 import re
-import jwt
-import time
 # from conf import settings
 
 load_dotenv()

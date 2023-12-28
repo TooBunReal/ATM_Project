@@ -1,8 +1,8 @@
 version: '3.9'
 
 services:
-  about_service:
-    container_name: file-services
+  file_service:
+    container_name: file_service
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,4 +11,4 @@ services:
     env_file:
       - .env
     volumes:
-      - .:/file-service
+      - .:/file_service

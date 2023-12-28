@@ -28,7 +28,7 @@ def gateway_login():
         password = request.form.get('password')
 
         authen_response = requests.post(
-            f"http://localhost:5002/api/login", json={'username': username, 'password': password}
+            f"http://authentication_service:5002/api/login", json={'username': username, 'password': password}
         )
 # khi nao co author thi send data qua thang author
         if authen_response.status_code == 200:
@@ -39,7 +39,7 @@ def gateway_login():
             print(userid)
             print(role)
             author_response = requests.post(
-                f"http://localhost:5005/auth", json={'userid': userid, 'role': role}
+                f"http://authorization_service:5005/auth", json={'userid': userid, 'role': role}
             )
             if author_response.status_code == 200:
                 token = author_response.json()
@@ -53,10 +53,10 @@ def gateway_login():
             return jsonify({'error': 'Authentication failed'}), 401
 
 
-@app.route('/logout', methods=['GET'])
-def logout():
-    response.delete_cookie('cookie_name', domain="cookie_domain")
-    return response
+# @app.route('/logout', methods=['GET'])
+# def logout():
+#     response.delete_cookie('cookie_name', domain="cookie_domain")
+#     return response
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -67,7 +67,7 @@ def gateway_register():
         username = request.form.get('username')
         password = request.form.get('password')
         auth_response = requests.post(
-            f"http://localhost:5002/api/register", json={'username': username, 'password': password}
+            f"http://authentication_service:5002/api/register", json={'username': username, 'password': password}
         )
 
         if auth_response.status_code == 200:
@@ -80,7 +80,8 @@ def gateway_register():
 
 @app.route('/read/<file_id>', methods=['GET'])
 def gateway_management_read(file_id):
-    response = requests.get(f'http://localhost:5003/api/read_file/{file_id}')
+    response = requests.get(
+        f'http://file_service:5003/api/read_file/{file_id}')
     file_data = response.json()
     print(file_data)
     return render_template('readfile.html', file_data=file_data)
@@ -96,7 +97,7 @@ def gateway_management_delete(file_id):
             if request.method == 'POST':
                 data_to_send = {"id": file_id}
             response = requests.post(
-                'http://localhost:5003/api/delete_file', json=[data_to_send])
+                'http://file_service:5003/api/delete_file', json=[data_to_send])
             status = response.json()
 
             for item in status:
@@ -119,7 +120,7 @@ def gateway_management_insert():
     }
 
     response = requests.post(
-        'http://localhost:5003/api/insert_file', json=[data_to_send])
+        'http://file_service:5003/api/insert_file', json=[data_to_send])
     status = response.json()
 
     for item in status:
@@ -133,7 +134,7 @@ def gateway_management_all_file():
     token = request.cookies.get('access_token')
     check, payload = decode_token(token)
     if (check):
-        response = requests.get('http://localhost:5003/api/allFile')
+        response = requests.get('http://file_service:5003/api/allFile')
         files_data = response.json()
         print(files_data)
         return render_template('allfile.html', files_data=files_data)
@@ -151,7 +152,8 @@ def gateway_management_feedback():
     if (check):
         scope = payload.get("scope")
         if scope == "admin_scope":
-            response = requests.get('http://localhost:5001/api/allfeedback')
+            response = requests.get(
+                'http://feedback_service:5001/api/allfeedback')
             feedbacks_data = response.json()
             print(feedbacks_data)
             return render_template('allfeedback.html', feedbacks_data=feedbacks_data)
@@ -173,7 +175,7 @@ def gateway_management_insert_feedback():
     }
 
     response = requests.post(
-        'http://localhost:5001/api/insert_feedback', json=[data_to_send])
+        'http://feedback_service:5001/api/insert_feedback', json=[data_to_send])
     status = response.json()
 
     for item in status:

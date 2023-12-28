@@ -1,13 +1,13 @@
 version: '3'
 services:
-  feedback_service:
-    container_name: feedback_service
+  authentication_service:
+    container_name: authentication_service
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - 5001:5001
+      - 5002:5002
     env_file:
       - .env
     volumes:
-      - ./feedback_service
+      - .:/authentication_service
