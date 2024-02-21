@@ -6,6 +6,10 @@ API-driven communication, organizational structure based on functionality, light
 coupled with autonomous management. While highlighting scalability, ease of maintenance, and reduced complexity, 
 this framework encounters challenges in managing interactions, monitoring performance, and ensuring data consistency.
 
+![image](https://github.com/TooBunReal/ATM_Project/assets/89735990/8c36bb85-4976-4f02-b1d6-a9b89e945627)
+
+
+
 |      Goals      |                 Solutions                     |
 | --------------- | --------------------------------------------- |
 | Authentication  | Username and Password                         |
