@@ -1,0 +1,13 @@
+version: '3'
+services:
+  authorization_service:
+    container_name: authorization_service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 5005:5005
+    env_file:
+      - .env
+    volumes:
+      - .:/authorization_service

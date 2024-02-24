@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: authen
+spec:
+  selector:
+    app: authen
+  type: ClusterIP
+  ports:
+  - port: 5002
+    targetPort: 5002 
+    protocol: TCP

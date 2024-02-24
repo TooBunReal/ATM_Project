@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gateway-configmap
+data:
+  SECRET_KEY: d1g1t4l_dr4g0n_1s_th3_b3st_ctf
+  FILE_SERVICE_URL: fileservice.default.svc.cluster.local:5003
+  FEEDBACK_SERVICE_URL: feedbackservice.default.svc.cluster.local:5001
+  AUTHENTICATION_SERVICE_URL: authen.default.svc.cluster.local:5002
+  AUTHORIZATION_SERVICE_URL: author.default.svc.cluster.local:5005
+  ALGORITHMS: HS256

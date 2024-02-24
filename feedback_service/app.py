@@ -1,10 +1,17 @@
+<<<<<<< HEAD
 from flask import Flask, request, send_file, jsonify
 from flask_sqlalchemy import SQLAlchemy
+=======
+from flask import Flask, request
+>>>>>>> origin/fix-docker
 from dotenv import load_dotenv
 from models import *
 import os
 import json
+<<<<<<< HEAD
 from operator import itemgetter
+=======
+>>>>>>> origin/fix-docker
 
 load_dotenv()
 app = Flask(__name__)
@@ -38,6 +45,7 @@ def insert_feedback():
     return json.dumps(status)
 
 
+<<<<<<< HEAD
 # @app.route('/api/delete_feedback', methods=['POST'])
 # def delete_feedback():
 #     feedbacks_json = request.get_json()
@@ -61,14 +69,47 @@ def insert_feedback():
 #         db.session.commit()
 
 #     return status
+=======
+@app.route('/api/delete_feedback', methods=['POST'])
+def delete_feedback():
+    feedbacks_json = request.get_json()
+    status = []
+    if not isinstance(feedbacks_json, list):
+        return json.dumps({"status": "Invalid payload format. Expected a list of feedbacks", "status_code": "400"})
+    for feedback_ids in feedbacks_json:
+        try:
+            get_id = feedback_ids.get('id')
+            feedback_query = Feedbacks.query.get(get_id)
+            if (feedback_query == None):
+                raise Exception
+            else:
+                Feedbacks.query.filter_by(feedback_id=get_id).delete()
+                status.append(
+                    {"status": f"feedback ID {get_id} deleted successfully", "status_code": "200"})
+        except:
+            status.append(
+                {"status": f"feedback ID {get_id} not found", "status_code": "404"})
+
+        db.session.commit()
+
+    return status
+
+>>>>>>> origin/fix-docker
 
 @app.route('/api/allfeedback', methods=['GET'])
 def get_all_feedback():
     feedbacks = Feedbacks.query.all()
+<<<<<<< HEAD
     feedback_list  = [feedback.__dict__ for feedback in feedbacks]
     for feedback in feedback_list:
         feedback.pop('_sa_instance_state')
     return json.dumps(feedback_list,default=str)
+=======
+    feedback_list = [feedback.__dict__ for feedback in feedbacks]
+    for feedback in feedback_list:
+        feedback.pop('_sa_instance_state')
+    return json.dumps(feedback_list, default=str)
+>>>>>>> origin/fix-docker
 
 
 if __name__ == '__main__':

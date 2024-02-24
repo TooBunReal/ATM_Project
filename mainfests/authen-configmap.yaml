@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authen-configmap
+data:
+  POSTGRESSQL_URI: postgresql://group13:Mk0979744542@authendb.postgres.database.azure.com:5432/postgres
+  SECRET_KEY: d1g1t4l_dr4g0n_1s_th3_b3st_ctf
+  ISSUER: 'sample-auth-server'
+  LIFE_SPAN: "1800"
+  ALGORITHMS: HS256

@@ -1,32 +1,65 @@
 version: '3'
 services:
-  frontend-service:
+  api_gateway_frontend_service:
+    extends:
+      file: ./api_gateway/docker-compose.yml
+      service: frontend_service
     restart: always
-    build:
-      context: ./api_gateway/gateway
-      dockerfile: Dockerfile
     ports:
       - 5000:5000
     volumes:
       - .:/api-gateway
 
-  nginx:
-    build:
-      context: ./api_gateway/nginx
-      dockerfile: Dockerfile
+  api_gateway_nginx_service:
+    extends:
+      file: ./api_gateway/docker-compose.yml
+      service: nginx_service
+    restart: always
     ports:
       - 8080:8080
     depends_on:
-      - frontend-service
+      - api_gateway_frontend_service
 
-  about_service:
-    container_name: file-services
-    build:
-      context: ./file_service
-      dockerfile: Dockerfile
+  feedback_service:
+    extends:
+      file: ./feedback_service/docker-compose.yml
+      service: feedback_service
+    ports:
+      - 5001:5001
+    env_file:
+      - ./feedback_service/.env
+    volumes:
+      - .:/feedback_service
+
+  file_service:
+    extends:
+      file: ./file_service/docker-compose.yml
+      service: file_service
     ports:
       - 5003:5003
     env_file:
       - ./file_service/.env
     volumes:
       - .:/file-service
+
+  authorization_service:
+    extends:
+      file: ./authorization_service/docker-compose.yml
+      service: authorization_service
+    ports:
+      - 5005:5005
+    env_file:
+      - ./authorization_service/.env
+    volumes:
+      - .:/authorization_service
+
+  authentication_service:
+    extends:
+      file: ./authentication_service/docker-compose.yml
+      service: authentication_service
+    ports:
+      - 5002:5002
+    env_file:
+      - ./authentication_service/.env
+    volumes:
+      - .:/authentication_service

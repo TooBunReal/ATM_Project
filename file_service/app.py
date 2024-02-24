@@ -1,10 +1,8 @@
-from flask import Flask, request, send_file, jsonify
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, request
 from dotenv import load_dotenv
 from models import *
 import os
 import json
-from operator import itemgetter
 
 load_dotenv()
 app = Flask(__name__)

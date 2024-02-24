@@ -1,0 +1,13 @@
+version: '3'
+services:
+  authentication_service:
+    container_name: authentication_service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 5002:5002
+    env_file:
+      - .env
+    volumes:
+      - .:/authentication_service
